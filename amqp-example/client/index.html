@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя курсовая деточка</title>
+    <script src="./script/index.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>Головер</header>
+        <section>
+            <h1 class="title">Пример работы с распределенными очередями сообщений</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi incidunt neque quas voluptatem ipsa quod asperiores quasi tenetur modi rerum in distinctio, quisquam vero sit repellendus delectus. Totam dolor beatae nam obcaecati!</p>
+        </section>
+        <section>
+            <div class="token-form">
+                <input id="wb-token-input" type="text" placeholder="Жду токен WB (o);">
+                <button onclick="document.apiEventEmitter.emit('start_working');">Тык</button>
+            </div>
+        </section>
+        <section class="work-progress">
+            <span>
+                <h3>Обработано задач </h3>
+            </span>
+            <span><p id="work-counter">0</p></span>
+            <div class="work-items"></div>
+        </section>
+        <footer>Ногер</footer>
+    </div>
+
+    <script>
+        function getWorkCounter$ () {
+            return document.getElementById('work-counter')
+        }
+        function getWbTokenInput$ () {
+            return document.getElementById('wb-token-input')
+        }
+    </script>
+
+    <script>
+        const $workCounter = getWorkCounter$()
+        const $wbTokenInput = getWbTokenInput$()
+        document.renderer.addElementRenderHook(
+            $workCounter,
+            () => $workCounter.innerText = document.api.workCounter
+        )
+        document.renderer.addElementRenderHook(
+            $wbTokenInput,
+            () => {
+                console.log(document.api.getToken())
+                $wbTokenInput.value = document.api.getToken() ?? ''
+            }
+        )
+
+        document.renderer.render()
+    </script>
+
+    <script>
+        document.apiEventEmitter.addEventListener('increment_work_counter', () => {
+            document.api.incrementWorkCounter()
+            document.renderer.render()
+        })
+        document.apiEventEmitter.addEventListener('start_working', () => {
+            const token = getWbTokenInput$().value
+            document.api.setToken(token)
+            document.renderer.render()
+            document.api.startAsyncWork(token)
+        })
+    </script>
+</body>
+</html>
