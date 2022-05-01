@@ -1,19 +1,16 @@
-import express from 'express'
-import cors from 'cors'
-import { NodeQueueClient } from '@quetela/core/build/builtins/queue-drivers/base-driver'
-import container from '@quetela/core/build/container'
+import { Ignitor } from "@quetela/core/build/ignitor"
+import { producerCtx, fetcherCtx, emitterCtx } from "./quetela/tasks/parse_token_stocks.context"
+import { runServer } from "./run-server"
+import { NodeQueueClient } from "@quetela/core/build/builtins/queue-drivers/base-driver"
 
-const queueClient = container.get<NodeQueueClient>('queueClient')
+async function main () {
+  await Ignitor({
+    queueClient: new NodeQueueClient(),
+    contexts: [producerCtx, fetcherCtx, emitterCtx],
+    // options: { debug: true }
+  })
 
-async function runServer (PORT: number) {
-    const app = express()
-    
-    app.use(express.json())
-    app.use(cors())
-    
-    app.post('/tasks/run/initial', (_req, res) => res.sendStatus(200))
-    
-    app.listen(PORT, () => console.log('listening on port ' + PORT))
+  await runServer(4200)
 }
 
-export { runServer }
+main()

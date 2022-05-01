@@ -22,6 +22,7 @@ export class ProxyQueue {
       throw new Error('Proxy is not found in proxy list!')
     }
     this.proxyList.push(targetProxy)
+    console.log({ targetProxy })
     return targetProxy
   }
 }

@@ -6,7 +6,7 @@ import { getProxy } from '../proxy/helpers'
 
 console.log(path.join(__dirname, '../proxy.txt'))
 
-const proxyQueue = new ProxyQueue(getProxy(path.join(__dirname, '../proxy.txt')))
+const proxyQueue = new ProxyQueue(getProxy(path.join(__dirname, '../../../proxy.txt')))
 
 const axiosInstance = axios.create()
 

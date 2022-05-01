@@ -1,38 +1,57 @@
-import { useEffect, useState } from 'react';
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [tokenInput, setTokenInput] = useState('')
-  const [request, setRequest] = useState(true)
+  const [runParse, setRunParse] = useState(false)
+  const [fetchCount, setFetchCount] = useState(0)
+  const [images, setImages] = useState([])
+  
 
-  useEffect( () => {
-    (async function () {
-      console.log('hello')
-    })()
+  useEffect(() => {
+    const socket = new WebSocket('ws://localhost:4200')
+    socket.addEventListener('open', () => console.log('WebSocket connection established'))
+    socket.addEventListener('message', message => {
+      setImages(prevState => ([...prevState, message.data]))
+    })
   }, [])
 
-  function wbTokenButtonHandler () {
-    window.localStorage.setItem('token', tokenInput)
+  useEffect(() => {
+    (async function () {
+      if (runParse) {
+        setImages([])
+        console.log('init parser')
+        await axios.post('http://localhost:4200/tasks/cats/run', { catCount: Number(fetchCount) })
+        setRunParse(false)
+      }
+    })()
+  }, [runParse])
+
+
+  function handleUpdateFetchCount (event) {
+    setFetchCount(event.target.value)
   }
 
-  function handleTokenInput (event) {
-    setTokenInput(event.target.value)
+  function handleRunParse () {
+    setRunParse(true)
   }
-
 
   return (
     <div className="App">
       <div className='token-form'>
         <input
           type='text'
-          placeholder='Push me hard'
-          value={tokenInput}
-          onChange={handleTokenInput}
+          placeholder='Сколько кошек?'
+          value={fetchCount}
+          onChange={handleUpdateFetchCount}
         />
+        <button onClick={handleRunParse}>Получить фото кошек</button>
       </div>
-      <button className='wb-token-button' onClick={wbTokenButtonHandler}>Tap me</button>
+      {
+        images.length > 0 && images.map((url, index) => <img className='crop' key={index} src={url} alt={index}/>)
+      }
     </div>
-  );
+  )
 }
 
 export default App
