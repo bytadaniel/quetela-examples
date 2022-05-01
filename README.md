@@ -1,1 +1,0 @@
-# quetela-examples
