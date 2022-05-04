@@ -7,7 +7,6 @@ async function main () {
   await Ignitor({
     queueClient: new NodeQueueClient(),
     contexts: [producerCtx, fetcherCtx, emitterCtx],
-    // options: { debug: true }
   })
 
   await runServer(4200)
